@@ -6,6 +6,10 @@ import urllib.request
 
 import json
 
+#importing subprocess module, let the python app ask the linux to scan the nearby Wi-Fi routers and MAC addresses even when the internet is offline
+
+import subprocess
+
 # get location data function helps to check if there is any machine internet connetion and we use try to check if the wifi is disconnected or the browser is down
 
 def get_location_data():
@@ -47,6 +51,27 @@ def get_location_data():
             "error": str(e)
         }
 
+#the scan nearby wifi function scan all the routers around that place where the device is.
+
+def scan_nearby_wifi():
+        
+
+        try:
+
+
+            #the subprocess.check_output runs nmcli to pick the wifi name(SSID), router MAC address(BSSID) , and SIGNAL 
+            
+            raw_output =subprocess.check_output(["nmcli", "-t", "-f","SSID,BSSID,SIGNAL", "dev", "wifi"], text=True, timeout=5)
+
+            return raw_output.replace("\\:", ":").strip().splitlines()
+
+
+        except Exception as e:
+
+            return [f"Wi-Fi scan failed: {str(e)}"]
+
+
+
 #we are testing get_location_data()
 
 if __name__ == "__main__":
@@ -56,5 +81,13 @@ if __name__ == "__main__":
     print(location_result)
 
 
+#we are testing the scan_nearby_wifi function to see any available router are the place
+
+    wifi_result = scan_nearby_wifi()
+    
+    for router in wifi_result:
+         
+
+        print(f" - {router}")
 
 
