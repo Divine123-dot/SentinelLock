@@ -40,6 +40,10 @@ def capture_intruder_photo(output_dir="incidents"):
         #the cv2.imwrite saves the photo to file_path
 
         if success:
+
+            #cv2.putText add on the picture the timestamp
+            display_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            cv2.putText(frame, display_time, (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255), 2)
             cv2.imwrite(file_path, frame)
             return file_path
         return None
