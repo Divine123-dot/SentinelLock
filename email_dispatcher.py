@@ -92,6 +92,30 @@ def send_security_alert(subject: str, body_text: str, attachment_path: str = Non
 
         return False
 
+#queue_offline_alert is the function sentinelLock uses when the thief turn off the wifi orput the device in airplane mode, sentinelLock make a queue and save the arlert locally but when internet comes it sent the alert immediately to the email
+
+def queue_offline_alert(subject: str, body_text: str, attachment_path: str = None):
+
+    #os.makedirs("incidents", exist_ok=True) this tell the system to first check if the incidents folder exists if it does not exist it tell the system to create one
+
+    try:
+
+        os.makedirs("incidents", exist_ok=True)
+
+        queue_file = "incidents/offline_queue.txt"
+
+        #we use the append mode so the alert can be saved in lines from the oldest to newst
+
+        with open(queue_file, "a") as f:
+            f.write(f"QUEUED ALERT | Subject: {subject} | Attachment:{attachment_path} | Body: {body_text}\n")
+
+        return queue_file
+
+    except Exception as e:
+
+        return None
+        
+
 
 #we are testing the email alert dispatcher
 
@@ -99,9 +123,17 @@ if __name__ == "__main__":
 
     #testing the email alert call
 
-    result = send_security_alert("SentinelOCK Test Alert", "Intruder detected on device!")
+#testing the security alert
+   
+    result =send_security_alert("SentinelLOCK Test Alert", "Intruder detected on device!")
 
     print(f"Email dispatch test result: {result}")
 
+    #if the sending the alert fails we queue the alert locally
+
+    if not result:
+        saved_queue = queue_offline_alert("SentinelLOCK Test Alert", "Intruder detected on device!", "incidents/test_secret.txt.enc")
+
+        print(f"Offline fallback triggered! Alert safely queued at: {saved_queue}")
 
 
